@@ -1,0 +1,11 @@
+<div class="container">
+    <h1>Iniciar sesión</h1>
+    
+    <form class="form" method="POST">
+      <input type="text" #username name="username" placeholder="Username">
+      <input type="password" #password name="password" placeholder="Password">
+      <button type="submit" (click)="logIn(username.value, password.value, $event)"  id="login-button">Login</button>
+    </form>
+    <p *ngIf="wrong_credentials">Wrong username/password</p>
+    <p *ngIf="unknown_error">Unknown error :(</p>
+  </div>
