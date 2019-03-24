@@ -1,3 +1,5 @@
-<p>
-  OKAAA
-</p>
+<table>
+  <tr *ngFor="let group of groups">
+  <td (click)="go_group(group)">{{group.name}}</td>
+   </tr>
+</table>

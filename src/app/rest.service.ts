@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
-import { DepFlags } from '@angular/core/src/view';
+import { HttpClient, HttpHeaders} from '@angular/common/http';
+import { Observable} from 'rxjs';
+import { Group } from './index/index.component'
 
 const endpoint = 'http://localhost:5000/';
 
@@ -25,7 +24,7 @@ export class RestService {
   }
 
   public get_groups(): Observable<any>{
-    return this.http.get(endpoint + 'group', this.httpOptions)
+    return this.http.get<Group[]>(endpoint + 'group', this.httpOptions)
   }
 
 }
