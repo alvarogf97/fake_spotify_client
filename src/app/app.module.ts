@@ -6,16 +6,12 @@ import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginFormComponent } from './login-form/login-form.component';
 import { IndexComponent } from './index/index.component';
-import { AlbumListComponent } from './album-list/album-list.component';
-import { SongListComponent } from './song-list/song-list.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginFormComponent,
     IndexComponent,
-    AlbumListComponent,
-    SongListComponent,
   ],
   imports: [
     BrowserModule,

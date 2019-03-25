@@ -3,3 +3,22 @@
   <td (click)="go_group(group)">{{group.name}}</td>
    </tr>
 </table>
+<hr>
+<table>
+  <tr *ngFor="let album of albums">
+  <td (click)="go_album(album)">{{album.name}}</td>
+   </tr>
+</table>
+<hr>
+<table>
+  <tr *ngFor="let song of songs">
+  <td (click)="go_song(song)">{{song.name}}</td>
+   </tr>
+</table>
+<hr>
+<div *ngIf="song_source">
+  <button *ngIf="this.audioService.isPlayingAudio()" (click)="this.audioService.pauseAudio()">PAUSE</button>
+  <button *ngIf="!this.audioService.isPlayingAudio()" (click)="this.audioService.playAudio()">PLAY</button>
+  {{this.audioService.getTimeElapsedValue()}}/{{this.audioService.getAudioDuration()}}
+  <button (click)="this.audioService.seekAudio(12)">SEEK</button>
+</div>

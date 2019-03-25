@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RestService } from '../rest.service';
 import { Router} from '@angular/router';
+import { AudioService } from '../audio.service';
 
 @Component({
   selector: 'app-index',
@@ -11,18 +12,45 @@ import { Router} from '@angular/router';
 export class IndexComponent implements OnInit {
 
   public groups: Group[]
+  public albums: Album[]
+  public songs: Song[]
+  public song_source: string
 
-  constructor(private restService: RestService, private router: Router,) { }
+  constructor(private restService: RestService, private router: Router, private audioService : AudioService) { }
 
   public go_group(group: Group){
-    console.log("clicked: " +group)
+    this.restService.get_albums(group).subscribe(
+      res => {
+          this.albums = res.albums
+      },
+      error => {
+        console.log(error)
+        this.navigate()
+      }
+    );
+  }
+
+  public go_album(album: Album){
+    this.restService.get_songs(album).subscribe(
+      res => {
+          this.songs = res.songs
+      },
+      error => {
+        console.log(error)
+        this.navigate()
+      }
+    );
+  }
+
+  public go_song(song: Song){
+    this.song_source = this.restService.endpoint + 'group/' + song.album.group.name + '/' + song.album.name + '/' + song.name
+    this.audioService.setAudio(this.song_source)
   }
 
   ngOnInit() {
     this.restService.get_groups().subscribe(
       res => {
           this.groups = res.groups
-          console.log(this.groups)
       },
       error => {
         console.log(error)
