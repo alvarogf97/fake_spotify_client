@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
+import { RestService } from './rest.service';
+import { Song } from './index/index.component'
 
 @Injectable({
   providedIn: 'root'
@@ -12,10 +14,15 @@ export class AudioService {
     public percentElapsed: BehaviorSubject<number> = new BehaviorSubject(0);
     public percentLoaded: BehaviorSubject<number> = new BehaviorSubject(0);
     public playerStatus: BehaviorSubject<string> = new BehaviorSubject('paused');
+    public playlist: Song[]
+    public actual_song: Song
+    public actual_img: string
+    public number_song: number
 
-    constructor() {
+    constructor(private restService: RestService) {
         this.audio = new Audio();
         this.attachListeners();
+        this.number_song = -1
     }
 
     private attachListeners(): void {
@@ -60,6 +67,9 @@ export class AudioService {
                 break;
             case 'ended':
                 this.playerStatus.next('ended');
+                if(this.playlist){
+                  this.next()
+                }
                 break;
             default:
                 this.playerStatus.next('paused');
@@ -74,13 +84,27 @@ export class AudioService {
         return this.audio;
     }
 
+    public setPlaylist(songs: Song[]): void {
+        this.playlist = songs
+        this.next()
+        this.get_group_img();
+        this.number_song = -1
+    }
+
+    public isPlayList() : Boolean {
+        return this.playlist != null
+    }
+
     /**
      * This is typically a URL to an MP3 file
      * @param src
      */
-    public setAudio(src: string): void {
-        this.audio.src = src;
+    public setAudio(song: Song): void {
+        this.audio.src = this.restService.endpoint + song.url
+        this.actual_song = song
         this.playAudio();
+        this.get_group_img();
+        this.playlist = null
     }
 
     /**
@@ -97,6 +121,27 @@ export class AudioService {
         this.audio.pause();
     }
 
+    public next(): void{
+        this.number_song = this.number_song + 1
+        if(this.number_song >= this.playlist.length){
+          this.number_song = 0
+        }
+        var song = this.playlist[this.number_song]
+        this.actual_song = song
+        this.audio.src = this.restService.endpoint + song.url
+        this.playAudio()
+    }
+
+    public prev(): void{
+        this.number_song = this.number_song - 1
+        if(this.number_song < 0){
+          this.number_song = this.playlist.length - 1
+        }
+        var song = this.playlist[this.number_song]
+        this.audio.src = this.restService.endpoint + 'group/' + song.album.group.name + '/' + song.album.name + '/' + song.name
+        this.playAudio()
+    }
+
     public isPlayingAudio(): boolean {
         return this.playerStatus.value == 'playing'
     }
@@ -105,12 +150,46 @@ export class AudioService {
      * Method to seek to a position on the audio track (in seconds),
      * @param position
      */
-    public seekAudio(position: number): void {
-        this.audio.currentTime = position
+    public seekAudio(percentaje: number): void {
+        this.audio.currentTime = percentaje*this.audio.duration/100
     }
 
-    public setVolume(level: number): void {
-        this.audio.volume = level
+    public getVolume() : number {
+        return this.audio.volume
+    }
+
+    public setVolume(volume: number): void {
+        this.audio.volume = volume
+    }
+
+    public getSongName(): String {
+        if(this.actual_song){
+          return this.actual_song.name
+        }else{
+          return ''
+        }
+    }
+
+    public get_group_img(){
+      this.restService.get_photo_group(this.actual_song.album.group).subscribe(
+        res => {
+            let reader = new FileReader();
+            reader.addEventListener("load", () => {
+              this.actual_img = reader.result.toString();
+              console.log(this.actual_img)
+            }, false);
+            if (res) {
+                reader.readAsDataURL(res);
+            }
+        },
+        error => {
+          console.log(error)
+        }
+      );
+    }
+
+    public getSong(): Song {
+      return this.actual_song
     }
 
     /**
@@ -182,6 +261,10 @@ export class AudioService {
      */
     public getPercentElapsed(): Observable<number> {
         return this.percentElapsed.asObservable();
+    }
+
+    public getPercentElapsedValue(): number {
+        return this.percentElapsed.value
     }
 
     /**

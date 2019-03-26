@@ -15,6 +15,7 @@ export class IndexComponent implements OnInit {
   public albums: Album[]
   public songs: Song[]
   public song_source: string
+  public is_playing: Boolean
 
   constructor(private restService: RestService, private router: Router, private audioService : AudioService) { }
 
@@ -42,9 +43,30 @@ export class IndexComponent implements OnInit {
     );
   }
 
+  public go_play_album(album: Album){
+    this.is_playing = true;
+    this.restService.get_songs(album).subscribe(
+      res => {
+        this.audioService.setPlaylist(res.songs)
+      },
+      error => {
+        console.log(error)
+        this.navigate()
+      }
+    );
+  }
+
   public go_song(song: Song){
-    this.song_source = this.restService.endpoint + 'group/' + song.album.group.name + '/' + song.album.name + '/' + song.name
-    this.audioService.setAudio(this.song_source)
+    this.is_playing = true;
+    this.audioService.setAudio(song)
+  }
+
+  public seek(event:any): void{
+    this.audioService.seekAudio(event.target.value)
+  }
+
+  public change_volume(event:any): void{
+    this.audioService.setVolume(event.target.value)
   }
 
   ngOnInit() {
@@ -63,6 +85,8 @@ export class IndexComponent implements OnInit {
     this.router.navigateByUrl('/');
   }
 
+
+
 }
 
 export interface Group {
@@ -77,4 +101,5 @@ export interface Album {
 export interface Song{
   name: string;
   album: Album;
+  url: string;
 }

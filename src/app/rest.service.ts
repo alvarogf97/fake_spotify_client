@@ -47,4 +47,8 @@ export class RestService {
     return this.http.get(this.endpoint + 'group/' + song.album.group.name + '/' + song.album.name + '/' + song.name, this.httpOptionsMP3)
   }
 
+  public get_photo_group(group: Group): Observable<any>{
+    return this.http.get(this.endpoint + group.name + '/image', this.httpOptionsMP3)
+  }
+
 }
