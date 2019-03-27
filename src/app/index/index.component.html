@@ -1,79 +1,103 @@
-<table>
-  <tr *ngFor="let group of groups">
-  <td (click)="go_group(group)">{{group.name}}</td>
-   </tr>
-</table>
-<hr>
-<table>
-  <tr *ngFor="let album of albums">
-  <td (click)="go_album(album)">{{album.name}}</td>
-  <td (click)="go_play_album(album)" >todo el album</td>
-   </tr>
-</table>
-<hr>
-<table>
-  <tr *ngFor="let song of songs">
-    <td (click)="go_song(song)">{{song.name}}</td>
-  </tr>
-</table>
-<hr>
 
-<div class="container" *ngIf="is_playing">
-    <div class="row">
+<div class="container">
+  <div class="row d-flex justify-content-center">
 
-        <div class="col-md justify-content-start">
-            <div class="row d-flex justify-content-center">
-              <img src="{{this.audioService.img}}" height="120" width="120">
-            </div>
-            <div class="row d-flex justify-content-center">
-                {{this.audioService.getSongName()}}
-            </div>
-        </div>
-
-        <div class="col-md justify-content-center">
-            <div class="row d-flex justify-content-center">
-              <div class="col-xs d-flex justify-content-center" *ngIf="this.audioService.isPlayList()">
-                  <button mdbBtn type="button" color="primary" size="md" mdbWavesEffect (click)="this.audioService.prev()">
-                      <mdb-icon fas icon="step-backward"></mdb-icon>
-                  </button>
-              </div>
-              <div class="col-xs d-flex justify-content-center">
-                  <button mdbBtn type="button" color="primary" mdbWavesEffect *ngIf="!this.audioService.isPlayingAudio()" (click)="this.audioService.playAudio()">
-                      <mdb-icon fas icon="play"></mdb-icon>
-                  </button>
-                  <button mdbBtn type="button" color="primary" mdbWavesEffect *ngIf="this.audioService.isPlayingAudio()" (click)="this.audioService.pauseAudio()">
-                      <mdb-icon fas icon="stop"></mdb-icon>
-                  </button>
-              </div>
-              <div class="col-xs d-flex justify-content-center" *ngIf="this.audioService.isPlayList()">
-                  <button mdbBtn type="button" color="primary" size="md"  mdbWavesEffect (click)="this.audioService.next()">
-                      <mdb-icon fas icon="step-forward"></mdb-icon>
-                  </button>
-              </div>
-            </div>
-            <div class="row d-flex justify-content-center">
-                <div class="col-xs d-flex justify-content-center" style="margin-top:30px">
-                    {{this.audioService.getTimeElapsedValue()}}
-                </div>
-                <div class="col-xs d-flex justify-content-between">
-                    <input mdbInput (change)="seek($event)" type="range" min="0" max="100" step="1" value={{this.audioService.getPercentElapsedValue()}}>
-                </div>
-                <div class="col-xs d-flex justify-content-center" style="margin-top:30px">
-                    {{this.audioService.getAudioDuration()}}
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md justify-content-end">
-            <div class="row d-flex justify-content-center">
-                <div class="col-xs d-flex justify-content-center" style="margin-top:20px">
-                    <mdb-icon fas icon="headphones-alt" size="3x"></mdb-icon>
-                </div>
-                <div class="col-xs d-flex justify-content-center">
-                    <input mdbInput (change)="change_volume($event)" type="range" min="0" max="1" step="0.1" value={{this.audioService.getVolume()}}>
-                </div>
-            </div>
-        </div>
-
+    <!----MIS GRUPOS---->
+    <div class="col-md justify-content-center">
+      <div class="list">
+          <p class="center-text">Grupos:</p>
+          <div class="list-container">
+              <a class="waves-light center-text" mdbWavesEffect *ngFor="let group of groups" (click)="go_group(group)">{{group.name}}</a>
+          </div>
+      </div>
     </div>
+    <!----ALBUMES---->
+    <div class="col-md justify-content-center">
+        <div class="list">
+            <p class="center-text">Albumes:</p>
+            <div class="list-container">
+                <a class="waves-light center-text" mdbWavesEffect (click)="go_album(album)" *ngFor="let album of albums">
+                  {{album.name}}
+                  <mdb-icon fas icon="play" style="margin-left:2px" (click)="go_play_album(album)"></mdb-icon>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!----CANCIONES---->
+    <div class="col-md justify-content-center">
+        <div class="list">
+            <p class="center-text">Canciones:</p>
+            <div class="list-container">
+                <a class="waves-light center-text" mdbWavesEffect *ngFor="let song of songs" (click)="go_song(song)">{{song.name}}</a>
+            </div>
+        </div>
+    </div>
+
+  </div>
+  <div class="row d-flex justify-content-center">
+    <!----REPRODUCTOR---->
+    <div class="container player" *ngIf="is_playing">
+        <div class="row d-flex justify-content-center">
+
+            <div class="col-md justify-content-center">
+                <div class="row d-flex justify-content-center" *ngIf="this.audioService.get_group_img()" style="margin-bottom: 5px">
+                  <img src={{this.audioService.get_group_img()}} height="120" width="120">
+                </div>
+                <div class="row d-flex justify-content-center">
+                    {{this.audioService.getSongName()}}
+                </div>
+            </div>
+
+            <div class="col-md justify-content-center">
+                <div class="row d-flex justify-content-center">
+                  <div class="col-xs d-flex justify-content-center" *ngIf="this.audioService.isPlayList()">
+                      <button mdbBtn type="button" color="primary" size="md" mdbWavesEffect (click)="this.audioService.prev()">
+                          <mdb-icon fas icon="step-backward"></mdb-icon>
+                      </button>
+                  </div>
+                  <div class="col-xs d-flex justify-content-center">
+                      <button mdbBtn type="button" color="primary" mdbWavesEffect *ngIf="!this.audioService.isPlayingAudio()" (click)="this.audioService.playAudio()">
+                          <mdb-icon fas icon="play"></mdb-icon>
+                      </button>
+                      <button mdbBtn type="button" color="primary" mdbWavesEffect *ngIf="this.audioService.isPlayingAudio()" (click)="this.audioService.pauseAudio()">
+                          <mdb-icon fas icon="stop"></mdb-icon>
+                      </button>
+                  </div>
+                  <div class="col-xs d-flex justify-content-center" *ngIf="this.audioService.isPlayList()">
+                      <button mdbBtn type="button" color="primary" size="md"  mdbWavesEffect (click)="this.audioService.next()">
+                          <mdb-icon fas icon="step-forward"></mdb-icon>
+                      </button>
+                  </div>
+                </div>
+                <div class="row d-flex justify-content-center">
+                    <div class="col-xs d-flex justify-content-center" style="margin-top:30px">
+                        {{this.audioService.getTimeElapsedValue()}}
+                    </div>
+                    <div class="col-xs d-flex justify-content-between">
+                        <input mdbInput (change)="seek($event)" type="range" min="0" max="100" step="1" value={{this.audioService.getPercentElapsedValue()}}>
+                    </div>
+                    <div class="col-xs d-flex justify-content-center" style="margin-top:30px">
+                        {{this.audioService.getAudioDuration()}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md justify-content-center">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-xs d-flex justify-content-center" style="margin-top:20px">
+                        <mdb-icon fas icon="headphones-alt" size="3x"></mdb-icon>
+                    </div>
+                    <div class="col-xs d-flex justify-content-center">
+                        <input mdbInput (change)="change_volume($event)" type="range" min="0" max="1" step="0.1" value={{this.audioService.getVolume()}}>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+  </div>
 </div>
+
+
+
+

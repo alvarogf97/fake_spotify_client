@@ -16,13 +16,12 @@ export class AudioService {
     public playerStatus: BehaviorSubject<string> = new BehaviorSubject('paused');
     public playlist: Song[]
     public actual_song: Song
-    public actual_img: string
-    public number_song: number
+    private number_song: BehaviorSubject<number> = new BehaviorSubject(0);
 
     constructor(private restService: RestService) {
         this.audio = new Audio();
         this.attachListeners();
-        this.number_song = -1
+        this.audio.volume = 0.3
     }
 
     private attachListeners(): void {
@@ -85,10 +84,9 @@ export class AudioService {
     }
 
     public setPlaylist(songs: Song[]): void {
+        this.number_song.next(-1)
         this.playlist = songs
         this.next()
-        this.get_group_img();
-        this.number_song = -1
     }
 
     public isPlayList() : Boolean {
@@ -103,7 +101,6 @@ export class AudioService {
         this.audio.src = this.restService.endpoint + song.url
         this.actual_song = song
         this.playAudio();
-        this.get_group_img();
         this.playlist = null
     }
 
@@ -122,23 +119,23 @@ export class AudioService {
     }
 
     public next(): void{
-        this.number_song = this.number_song + 1
-        if(this.number_song >= this.playlist.length){
-          this.number_song = 0
+        this.number_song.next(this.number_song.value + 1)
+        if(this.number_song.value >= this.playlist.length){
+          this.number_song.next(0)
         }
-        var song = this.playlist[this.number_song]
+        var song = this.playlist[this.number_song.value]
         this.actual_song = song
         this.audio.src = this.restService.endpoint + song.url
         this.playAudio()
     }
 
     public prev(): void{
-        this.number_song = this.number_song - 1
-        if(this.number_song < 0){
-          this.number_song = this.playlist.length - 1
+      this.number_song.next(this.number_song.value - 1)
+        if(this.number_song.value < 0){
+          this.number_song.next(this.playlist.length - 1)
         }
-        var song = this.playlist[this.number_song]
-        this.audio.src = this.restService.endpoint + 'group/' + song.album.group.name + '/' + song.album.name + '/' + song.name
+        var song = this.playlist[this.number_song.value]
+        this.audio.src = this.restService.endpoint + song.url
         this.playAudio()
     }
 
@@ -171,21 +168,10 @@ export class AudioService {
     }
 
     public get_group_img(){
-      this.restService.get_photo_group(this.actual_song.album.group).subscribe(
-        res => {
-            let reader = new FileReader();
-            reader.addEventListener("load", () => {
-              this.actual_img = reader.result.toString();
-              console.log(this.actual_img)
-            }, false);
-            if (res) {
-                reader.readAsDataURL(res);
-            }
-        },
-        error => {
-          console.log(error)
-        }
-      );
+      if(this.actual_song){
+        return this.restService.endpoint + '/' + this.actual_song.album.group.name + '/image'
+      }
+      return null
     }
 
     public getSong(): Song {

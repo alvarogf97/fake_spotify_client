@@ -23,6 +23,7 @@ export class IndexComponent implements OnInit {
     this.restService.get_albums(group).subscribe(
       res => {
           this.albums = res.albums
+          this.songs = null
       },
       error => {
         console.log(error)
